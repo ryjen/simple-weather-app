@@ -4,32 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.myweatherapp.data.local.WeatherPreferences
-import com.example.myweatherapp.data.remote.WeatherApiService
-import com.example.myweatherapp.data.repository.WeatherRepository
+import com.example.myweatherapp.features.forecast.interactors.ForecastInteractor
+import com.example.myweatherapp.features.forecast.types.ForecastEffect
+import com.example.myweatherapp.features.forecast.types.ForecastIntent
+import com.example.myweatherapp.features.forecast.views.ForecastScreen
+import com.example.myweatherapp.features.welcome.interactors.WelcomeInteractor
+import com.example.myweatherapp.features.welcome.types.WelcomeEffect
+import com.example.myweatherapp.features.welcome.views.WelcomeScreen
+import com.example.myweatherapp.features.weather.interactors.WeatherInteractor
+import com.example.myweatherapp.features.weather.types.WeatherEffect
+import com.example.myweatherapp.features.weather.views.CurrentWeatherScreen
 import com.example.myweatherapp.ui.NavRoute
-import com.example.myweatherapp.ui.screens.CurrentWeatherScreen
-import com.example.myweatherapp.ui.screens.ForecastScreen
-import com.example.myweatherapp.ui.screens.WelcomeScreen
 import com.example.myweatherapp.ui.theme.MyWeatherAppTheme
-import com.example.myweatherapp.viewmodel.WeatherViewModel
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,36 +46,59 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WeatherApp() {
     val context = LocalContext.current
-    
-    val repository = remember {
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-        
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+    val appGraph = remember { WeatherAppGraph(context.applicationContext) }
+    val welcomeInteractor: WelcomeInteractor = viewModel()
+    val forecastInteractor: ForecastInteractor = viewModel()
+    val weatherInteractor: WeatherInteractor = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return appGraph.createWeatherInteractor() as T
+            }
         }
-        
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging)
-            .build()
-            
-        val apiService = Retrofit.Builder()
-            .baseUrl(WeatherApiService.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(client)
-            .build()
-            .create(WeatherApiService::class.java)
-            
-        val preferences = WeatherPreferences(context)
-        WeatherRepository(apiService, preferences)
-    }
-
-    val weatherViewModel: WeatherViewModel = viewModel {
-        WeatherViewModel(repository)
-    }
+    )
+    val weatherState by weatherInteractor.state.collectAsState()
+    val forecastState by forecastInteractor.state.collectAsState()
+    val welcomeDispatch = welcomeInteractor::dispatch
+    val forecastDispatch = forecastInteractor::dispatch
+    val dispatch = weatherInteractor::dispatch
 
     val backStack = rememberNavBackStack(NavRoute.Welcome)
+
+    LaunchedEffect(welcomeInteractor, backStack) {
+        welcomeInteractor.effects.collect { effect ->
+            when (effect) {
+                WelcomeEffect.NavigateToWeather -> backStack.add(NavRoute.CurrentWeather)
+            }
+        }
+    }
+
+    LaunchedEffect(weatherInteractor, backStack) {
+        weatherInteractor.effects.collect { effect ->
+            when (effect) {
+                WeatherEffect.NavigateToForecast -> backStack.add(NavRoute.Forecast)
+            }
+        }
+    }
+
+    LaunchedEffect(forecastInteractor, backStack) {
+        forecastInteractor.effects.collect { effect ->
+            when (effect) {
+                ForecastEffect.NavigateBack -> if (backStack.size > 1) {
+                    backStack.removeAt(backStack.size - 1)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(weatherState.forecast, weatherState.isLoading) {
+        forecastInteractor.dispatch(
+            ForecastIntent.ForecastDataChanged(
+                forecast = weatherState.forecast,
+                isLoading = weatherState.isLoading
+            )
+        )
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -89,23 +112,23 @@ fun WeatherApp() {
                 is NavRoute.Welcome -> {
                     NavEntry(key) {
                         WelcomeScreen(
-                            onStartClick = { backStack.add(NavRoute.CurrentWeather) }
+                            dispatch = welcomeDispatch
                         )
                     }
                 }
                 is NavRoute.CurrentWeather -> {
                     NavEntry(key) {
                         CurrentWeatherScreen(
-                            viewModel = weatherViewModel,
-                            onShowForecast = { backStack.add(NavRoute.Forecast) }
+                            state = weatherState,
+                            dispatch = dispatch
                         )
                     }
                 }
                 is NavRoute.Forecast -> {
                     NavEntry(key) {
                         ForecastScreen(
-                            viewModel = weatherViewModel,
-                            onBack = { backStack.removeAt(backStack.size - 1) }
+                            state = forecastState,
+                            dispatch = forecastDispatch
                         )
                     }
                 }
