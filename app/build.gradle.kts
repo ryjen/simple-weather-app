@@ -67,6 +67,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.adaptive)
@@ -92,7 +93,7 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.material)
     implementation(libs.moshi.kotlin)
     implementation(libs.okhttp)

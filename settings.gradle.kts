@@ -24,4 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "MyWeatherApp"
 include(":app")
+include(":shared")
+include(":composeApp")
  

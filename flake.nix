@@ -53,7 +53,8 @@
             echo "  Java: $(java -version 2>&1 | head -1)"
             echo "  Android SDK: $ANDROID_HOME"
             echo ""
-            echo "Run 'bundle install' to install gem dependencies."
+            bundle install --jobs 4
+            echo ""
             echo "Run 'fastlane android build_debug' to build."
           '';
         };

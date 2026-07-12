@@ -1,65 +1,112 @@
-## Android Release with Fastlane
+fastlane documentation
+----
 
-### Prerequisites
+# Installation
 
-1. Install Ruby and Fastlane:
-   ```bash
-   gem install bundler
-   bundle install
-   ```
+Make sure you have the latest version of the Xcode command line tools installed:
 
-2. Set up signing:
-   - Create a keystore: `keytool -genkey -v -keystore release.keystore -alias myalias -keyalg RSA -keysize 2048 -validity 10000`
-   - Add to `local.properties`:
-     ```
-     KEYSTORE_FILE=app/release.keystore
-     KEY_ALIAS=myalias
-     KEY_PASSWORD=yourpassword
-     STORE_PASSWORD=yourpassword
-     ```
+```sh
+xcode-select --install
+```
 
-3. Set up Firebase:
-   - Create a Firebase project and register your Android app
-   - Download `google-services.json` and place in `app/` directory
-   - Get your App ID from Firebase Console
-   - Generate a CI token: `firebase login:ci`
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-### Available Lanes
+# Available Actions
 
-| Lane | Description |
-|------|-------------|
-| `build_debug` | Build debug APK |
-| `build_release` | Build release APK with signing |
-| `test` | Run all tests |
-| `unit_tests` | Run unit tests only |
-| `deploy_firebase` | Deploy to Firebase App Distribution |
-| `build_and_deploy_firebase` | Build release and deploy to Firebase |
-| `deploy_internal` | Deploy to Play Store internal track |
-| `deploy_beta` | Deploy to Play Store beta track |
-| `deploy_production` | Deploy to Play Store production |
-| `bump_version_code` | Increment version code by 1 |
-| `bump_version_name` | Increment version name |
+## Android
 
-### GitHub Actions Secrets
+### android build_debug
 
-Add these secrets in your GitHub repository (Settings → Secrets → Actions):
+```sh
+[bundle exec] fastlane android build_debug
+```
 
-| Secret | Description |
-|--------|-------------|
-| `KEYSTORE_BASE64` | Base64 encoded keystore (`base64 -w 0 release.keystore`) |
-| `KEY_ALIAS` | Keystore alias |
-| `KEY_PASSWORD` | Key password |
-| `STORE_PASSWORD` | Keystore password |
-| `FIREBASE_APP_ID` | Firebase App ID (e.g., `1:123456789:android:abc123`) |
-| `FIREBASE_TOKEN` | Firebase CI token from `firebase login:ci` |
+Build debug APK
 
-### CI/CD Workflow
+### android build_release
 
-- **On push to `develop`**: Runs tests and builds debug APK
-- **On push to `main`**: Runs tests, builds release APK, and deploys to Firebase App Distribution
+```sh
+[bundle exec] fastlane android build_release
+```
 
-### Version Bumping
+Build release APK with signing
 
-- **Major version**: `bundle exec fastlane bump_version_name type:major` (1.0.0 → 2.0.0)
-- **Minor version**: `bundle exec fastlane bump_version_name type:minor` (1.0.0 → 1.1.0)
-- **Patch version**: `bundle exec fastlane bump_version_name type:patch` (1.0.0 → 1.0.1)
+### android test
+
+```sh
+[bundle exec] fastlane android test
+```
+
+Build and test
+
+### android unit_tests
+
+```sh
+[bundle exec] fastlane android unit_tests
+```
+
+Run unit tests
+
+### android deploy_firebase
+
+```sh
+[bundle exec] fastlane android deploy_firebase
+```
+
+Deploy to Firebase App Distribution
+
+### android build_and_deploy_firebase
+
+```sh
+[bundle exec] fastlane android build_and_deploy_firebase
+```
+
+Build and deploy to Firebase
+
+### android deploy_internal
+
+```sh
+[bundle exec] fastlane android deploy_internal
+```
+
+Build and deploy to internal track
+
+### android deploy_beta
+
+```sh
+[bundle exec] fastlane android deploy_beta
+```
+
+Build and deploy to beta track
+
+### android deploy_production
+
+```sh
+[bundle exec] fastlane android deploy_production
+```
+
+Build and deploy to production
+
+### android bump_version_code
+
+```sh
+[bundle exec] fastlane android bump_version_code
+```
+
+Increment version code
+
+### android bump_version_name
+
+```sh
+[bundle exec] fastlane android bump_version_name
+```
+
+Increment version name
+
+----
+
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
+
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).
