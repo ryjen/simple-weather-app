@@ -36,3 +36,8 @@ google-services.json
 # Agents
 .agent
 .serena
+
+# Ruby/Fastlane
+vendor/
+.bundle/
+Gemfile.lock

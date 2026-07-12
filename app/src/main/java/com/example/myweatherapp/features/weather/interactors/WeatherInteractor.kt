@@ -10,15 +10,27 @@ import com.example.myweatherapp.features.weather.usecases.LoadLastCityUseCase
 import com.example.myweatherapp.features.weather.usecases.SearchWeatherUseCase
 import kotlinx.coroutines.launch
 
+/**
+ * The Interactor responsible for managing the business logic of the Weather feature.
+ * It handles the MVI flow by processing [WeatherIntent]s and emitting [WeatherState] updates
+ * and [WeatherEffect]s.
+ *
+ * @property searchWeatherUseCase Use case for searching weather by city name.
+ * @property loadLastCityUseCase Use case for retrieving the previously searched city.
+ */
 class WeatherInteractor(
     private val searchWeatherUseCase: SearchWeatherUseCase,
     private val loadLastCityUseCase: LoadLastCityUseCase
 ) : Interactor<WeatherState, WeatherIntent, WeatherEffect>(WeatherState(), ::weatherReducer) {
 
     init {
+        // Automatically load the last searched city on initialization
         dispatch(WeatherIntent.LoadLastCityRequested)
     }
 
+    /**
+     * Processes side-effect triggering intents.
+     */
     override fun induce(intent: WeatherIntent, state: WeatherState) {
         when (intent) {
             WeatherIntent.LoadLastCityRequested -> loadLastCity()
@@ -33,6 +45,9 @@ class WeatherInteractor(
         }
     }
 
+    /**
+     * Attempts to load the last city and triggers a search if successful.
+     */
     private fun loadLastCity() {
         viewModelScope.launch {
             val cityName = loadLastCityUseCase.execute()?.trim().orEmpty()
@@ -43,6 +58,10 @@ class WeatherInteractor(
         }
     }
 
+    /**
+     * Executes the search operation for the given city name.
+     * Updates the state with loading, success, or failure results.
+     */
     private fun search(rawCityName: String) {
         val cityName = rawCityName.trim()
         if (cityName.isEmpty()) return
