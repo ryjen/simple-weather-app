@@ -32,6 +32,7 @@ class ForecastReducerTest {
         assertEquals(2, next.days.size)
         assertEquals(2, next.days.first().hours.size)
         assertEquals(listOf(20, 18), next.days.first().hours.map { it.tempCelsius })
+        assertEquals(listOf(21, 19), next.days.first().hours.map { it.feelsLikeCelsius })
         assertEquals("Few clouds", next.days.first().hours.first().description)
         assertEquals("02d", next.days.first().hours.first().icon)
         assertTrue(next.isLoading)
@@ -66,7 +67,7 @@ class ForecastReducerTest {
     ): ForecastItem {
         return ForecastItem(
             dt = dt,
-            main = MainWeather(temp, temp, 60, 1012),
+            main = MainWeather(temp, temp + 1, 60, 1012),
             weather = listOf(WeatherDescription("Clouds", description, icon)),
             dtTxt = ""
         )
@@ -78,6 +79,7 @@ class ForecastReducerTest {
             HourlyForecast(
                 timeLabel = "12:00",
                 tempCelsius = 20,
+                feelsLikeCelsius = 22,
                 description = "Few clouds",
                 icon = "02d"
             )

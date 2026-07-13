@@ -138,6 +138,10 @@ fun ForecastHourView(hour: HourlyForecast) {
             fontWeight = FontWeight.Bold
         )
         Text(
+            text = "Feels like ${hour.feelsLikeCelsius}°C",
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(
             text = hour.description,
             style = MaterialTheme.typography.bodySmall
         )
@@ -153,8 +157,8 @@ fun ForecastScreenPreview() {
                 DailyForecast(
                     dateLabel = "Wed, Jun 30",
                     hours = listOf(
-                        HourlyForecast("12:00", 20, "Few clouds", "02d"),
-                        HourlyForecast("15:00", 18, "Light rain", "10d")
+                        HourlyForecast("12:00", 20, 22, "Few clouds", "02d"),
+                        HourlyForecast("15:00", 18, 17, "Light rain", "10d")
                     )
                 )
             )

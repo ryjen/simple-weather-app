@@ -18,6 +18,7 @@ data class DailyForecast(
 data class HourlyForecast(
     val timeLabel: String,
     val tempCelsius: Int,
+    val feelsLikeCelsius: Int,
     val description: String,
     val icon: String?
 )
@@ -49,6 +50,7 @@ fun ForecastResponse.toDailyForecasts(): List<DailyForecast> {
                     HourlyForecast(
                         timeLabel = timeFormatter.format(Date(item.dt * 1000L)),
                         tempCelsius = item.main.temp.toInt(),
+                        feelsLikeCelsius = item.main.feelsLike.toInt(),
                         description = item.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() }.orEmpty(),
                         icon = item.weather.firstOrNull()?.icon
                     )
