@@ -7,6 +7,8 @@ on:
     branches: [ main ]
 
 env:
+  HOME: ${{ github.workspace }}
+  GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
   NIX_CONFIG: "experimental-features = nix-command flakes"
 
 jobs:
