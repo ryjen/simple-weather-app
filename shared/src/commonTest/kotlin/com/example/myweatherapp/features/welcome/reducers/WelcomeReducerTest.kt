@@ -2,8 +2,8 @@ package com.example.myweatherapp.domain.reducer
 
 import com.example.myweatherapp.domain.types.WelcomeIntent
 import com.example.myweatherapp.domain.types.WelcomeState
-import org.junit.Assert.assertSame
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertSame
 
 class WelcomeReducerTest {
     @Test

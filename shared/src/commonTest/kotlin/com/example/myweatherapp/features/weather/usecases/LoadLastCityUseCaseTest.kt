@@ -2,9 +2,9 @@ package com.example.myweatherapp.domain.usecase
 
 import com.example.myweatherapp.testing.FakeWeatherRepository
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.Test
 
 class LoadLastCityUseCaseTest {
     @Test

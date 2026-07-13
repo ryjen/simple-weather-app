@@ -4,12 +4,12 @@ import com.example.myweatherapp.domain.model.ForecastResponse
 import com.example.myweatherapp.domain.types.WeatherIntent
 import com.example.myweatherapp.domain.types.WeatherState
 import com.example.myweatherapp.testing.sampleWeather
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
+import kotlin.test.Test
 
 class WeatherReducerTest {
     @Test

@@ -8,14 +8,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Rule
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WelcomeInteractorTest {
-    @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    @BeforeTest
+    fun setup() { mainDispatcherRule.setup() }
+
+    @kotlin.test.AfterTest
+    fun tearDown() { mainDispatcherRule.tearDown() }
 
     @Test
     fun getStartedClickedEmitsNavigationEffect() = runTest {
