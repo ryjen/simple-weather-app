@@ -19,7 +19,7 @@ android {
     defaultConfig {
         applicationId = "com.example.myweatherapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -31,10 +31,13 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystorePath = System.getenv("KEYSTORE_FILE") ?: localProps.getProperty("KEYSTORE_FILE") ?: ""
-            val keystorePassword = System.getenv("STORE_PASSWORD") ?: localProps.getProperty("STORE_PASSWORD") ?: ""
+            val keystorePath =
+                System.getenv("KEYSTORE_FILE") ?: localProps.getProperty("KEYSTORE_FILE") ?: ""
+            val keystorePassword =
+                System.getenv("STORE_PASSWORD") ?: localProps.getProperty("STORE_PASSWORD") ?: ""
             val keyAlias = System.getenv("KEY_ALIAS") ?: localProps.getProperty("KEY_ALIAS") ?: ""
-            val keyPassword = System.getenv("KEY_PASSWORD") ?: localProps.getProperty("KEY_PASSWORD") ?: ""
+            val keyPassword =
+                System.getenv("KEY_PASSWORD") ?: localProps.getProperty("KEY_PASSWORD") ?: ""
 
             if (keystorePath.isNotEmpty()) {
                 storeFile = file(keystorePath)
@@ -67,6 +70,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.adaptive)
@@ -89,14 +93,15 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.coil.compose)
-    implementation(libs.converter.moshi)
+    implementation(libs.coil.network.ktor)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.material)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.okhttp)
-    implementation(libs.retrofit)
     testImplementation(libs.androidx.core)
     testImplementation(libs.androidx.junit)
     testImplementation(libs.junit)
@@ -106,8 +111,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.ktor.client.mock)
+    androidTestImplementation(libs.kotlinx.serialization.json)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     "ksp"(libs.androidx.room.compiler)
-    "ksp"(libs.moshi.kotlin.codegen)
 }

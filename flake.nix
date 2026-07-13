@@ -19,8 +19,8 @@
 
 
         androidComposition = pkgs.androidenv.composeAndroidPackages {
-          platformVersions = [ "34" "35" "37" ];
-          buildToolsVersions = [ "34.0.0" "35.0.0" "36.0.0" ];
+          platformVersions = [ "34" "35" "36" "37" ];
+          buildToolsVersions = [ "34.0.0" "35.0.0" "36.0.0" "37.0.0" ];
           cmdLineToolsVersion = "latest";
           platformToolsVersion = "35.0.2";
           includeNDK = false;
@@ -53,7 +53,8 @@
             echo "  Java: $(java -version 2>&1 | head -1)"
             echo "  Android SDK: $ANDROID_HOME"
             echo ""
-            echo "Run 'bundle install' to install gem dependencies."
+            bundle install --jobs 4
+            echo ""
             echo "Run 'fastlane android build_debug' to build."
           '';
         };

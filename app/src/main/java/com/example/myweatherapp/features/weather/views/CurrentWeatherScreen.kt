@@ -1,5 +1,6 @@
 package com.example.myweatherapp.features.weather.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
@@ -21,7 +25,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -39,13 +45,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.example.myweatherapp.data.model.CurrentWeatherResponse
-import com.example.myweatherapp.data.model.MainWeather
-import com.example.myweatherapp.data.model.WeatherDescription
-import com.example.myweatherapp.data.model.Wind
+import coil3.compose.AsyncImage
+import com.example.myweatherapp.domain.model.CurrentWeatherResponse
+import com.example.myweatherapp.domain.model.GeocodingResponse
+import com.example.myweatherapp.domain.model.MainWeather
+import com.example.myweatherapp.domain.model.WeatherDescription
+import com.example.myweatherapp.domain.model.Wind
 import com.example.myweatherapp.features.weather.types.WeatherIntent
 import com.example.myweatherapp.features.weather.types.WeatherState
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,12 +110,56 @@ fun CurrentWeatherScreen(
                 state.errorMessage != null -> ErrorContent(state.errorMessage) {
                     dispatch(WeatherIntent.RetryRequested)
                 }
+
+                state.searchResults.isNotEmpty() -> CitySearchResults(state.searchResults) {
+                    dispatch(WeatherIntent.CitySelected(it))
+                }
+
                 state.currentWeather != null -> WeatherContent(state.currentWeather)
                 else -> Text(
                     "Search for a city to see the weather",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun CitySearchResults(
+    results: List<GeocodingResponse>,
+    onCitySelected: (GeocodingResponse) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = "Multiple cities found. Please select one:",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(8.dp)
+            )
+            LazyColumn {
+                items(results) { location ->
+                    ListItem(
+                        headlineContent = { Text(location.name) },
+                        supportingContent = {
+                            Text("${location.state?.let { "$it, " } ?: ""}${location.country}")
+                        },
+                        leadingContent = {
+                            Icon(Icons.Rounded.LocationOn, contentDescription = null)
+                        },
+                        modifier = Modifier.clickable { onCitySelected(location) }
+                    )
+                    if (location != results.last()) {
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    }
+                }
             }
         }
     }
@@ -139,7 +191,7 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
             )
 
             Text(
-                text = "${weather.main.temp.toInt()}°C",
+                text = "${weather.main.temp.roundToInt()}°C",
                 style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = 72.sp
@@ -147,7 +199,8 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
             )
 
             Text(
-                text = weather.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: "",
+                text = weather.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() }
+                    ?: "",
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -157,7 +210,10 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                WeatherDetailItem(label = "Feels Like", value = "${weather.main.feelsLike.toInt()}°C")
+                WeatherDetailItem(
+                    label = "Feels Like",
+                    value = "${weather.main.feelsLike.roundToInt()}°C"
+                )
                 WeatherDetailItem(label = "Humidity", value = "${weather.main.humidity}%")
                 WeatherDetailItem(label = "Wind", value = "${weather.wind.speed} m/s")
             }
@@ -169,7 +225,11 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
 fun WeatherDetailItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
