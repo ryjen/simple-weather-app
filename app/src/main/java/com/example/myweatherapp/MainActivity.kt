@@ -31,9 +31,6 @@ import com.example.myweatherapp.features.weather.views.CurrentWeatherScreen
 import com.example.myweatherapp.ui.NavRoute
 import com.example.myweatherapp.ui.theme.MyWeatherAppTheme
 
-private const val APP_PREFS_NAME = "weather_prefs"
-private const val HAS_SEEN_WELCOME_KEY = "has_seen_welcome"
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +45,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WeatherApp() {
-    val context = LocalContext.current
-    val appGraph = remember { WeatherAppGraph(context.applicationContext) }
+    val appGraph = rememberWeatherAppGraph()
     val welcomeInteractor: WelcomeInteractor = viewModel()
     val forecastInteractor: ForecastInteractor = viewModel()
     val weatherInteractor: WeatherInteractor = viewModel(
@@ -66,15 +62,8 @@ fun WeatherApp() {
     val forecastDispatch = forecastInteractor::dispatch
     val dispatch = weatherInteractor::dispatch
 
-    val appPreferences = remember {
-        context.applicationContext.getSharedPreferences(APP_PREFS_NAME, android.content.Context.MODE_PRIVATE)
-    }
     val initialRoute = remember {
-        if (appPreferences.getBoolean(HAS_SEEN_WELCOME_KEY, false)) {
-            NavRoute.CurrentWeather
-        } else {
-            NavRoute.Welcome
-        }
+        initialRoute(appGraph.hasSeenWelcome())
     }
 
     val backStack = rememberNavBackStack(initialRoute)
@@ -83,7 +72,7 @@ fun WeatherApp() {
         welcomeInteractor.effects.collect { effect ->
             when (effect) {
                 WelcomeEffect.NavigateToWeather -> {
-                    appPreferences.edit().putBoolean(HAS_SEEN_WELCOME_KEY, true).apply()
+                    appGraph.markWelcomeSeen()
                     backStack.clear()
                     backStack.add(NavRoute.CurrentWeather)
                 }
@@ -154,4 +143,18 @@ fun WeatherApp() {
             }
         }
     )
+}
+
+@Composable
+private fun rememberWeatherAppGraph(): WeatherAppGraph {
+    val context = LocalContext.current
+    return remember { WeatherAppGraph(context.applicationContext) }
+}
+
+internal fun initialRoute(hasSeenWelcome: Boolean): NavRoute {
+    return if (hasSeenWelcome) {
+        NavRoute.CurrentWeather
+    } else {
+        NavRoute.Welcome
+    }
 }
