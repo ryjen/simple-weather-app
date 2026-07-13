@@ -15,6 +15,7 @@ import coil3.compose.AsyncImage
 import com.example.myweatherapp.domain.model.ForecastItem
 import com.example.myweatherapp.domain.types.ForecastIntent
 import com.example.myweatherapp.domain.types.ForecastState
+import com.example.myweatherapp.util.DateTimeUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +84,7 @@ fun ForecastItemView(item: ForecastItem) {
         ) {
             Column {
                 Text(
-                    text = item.dtTxt, // Using raw string for now
+                    text = DateTimeUtil.formatTimestamp(item.dt),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )

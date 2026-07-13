@@ -88,7 +88,7 @@ struct WeatherContentView: View {
             }
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(Color.primaryBlue.opacity(0.1))
         .cornerRadius(24)
         .padding()
     }

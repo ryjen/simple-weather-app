@@ -24,7 +24,7 @@ struct ForecastItemView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(item.dtTxt) // Placeholder for date formatting
+                Text(DateTimeUtil.shared.formatTimestamp(timestamp: item.dt))
                     .font(.headline)
                 Text(item.weather.first?.description_.capitalized ?? "")
                     .font(.subheadline)
@@ -36,6 +36,7 @@ struct ForecastItemView: View {
             Text("\(Int(item.main.temp))°C")
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundColor(.secondaryOrange)
 
             AsyncImage(url: URL(string: "https://openweathermap.org/img/wn/\(item.weather.first?.icon ?? "")@2x.png")) { image in
                 image.resizable()
