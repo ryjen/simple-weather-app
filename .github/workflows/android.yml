@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  NIX_CONFIG: "experimental-features = nix-command flakes"
+
 jobs:
   build:
     runs-on: self-hosted
@@ -14,20 +17,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-
     - name: Install Fastlane
-      run: bundle install
+      run: nix develop --command bundle install
 
     - name: Decode Keystore
       env:
@@ -36,10 +27,10 @@ jobs:
         echo "$KEYSTORE_BASE64" | base64 -d > app/release.keystore
 
     - name: Run Unit Tests
-      run: bundle exec fastlane unit_tests
+      run: nix develop --command bundle exec fastlane unit_tests
 
     - name: Build Debug APK
-      run: bundle exec fastlane build_debug
+      run: nix develop --command bundle exec fastlane build_debug
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -56,20 +47,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-
     - name: Install Fastlane
-      run: bundle install
+      run: nix develop --command bundle install
 
     - name: Decode Keystore
       env:
@@ -83,13 +62,13 @@ jobs:
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-      run: bundle exec fastlane build_release
+      run: nix develop --command bundle exec fastlane build_release
 
     - name: Deploy to Firebase App Distribution
       env:
         FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-      run: bundle exec fastlane deploy_firebase
+      run: nix develop --command bundle exec fastlane deploy_firebase
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
