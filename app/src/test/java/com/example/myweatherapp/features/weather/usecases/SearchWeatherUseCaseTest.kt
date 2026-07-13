@@ -34,8 +34,8 @@ class SearchWeatherUseCaseTest {
         try {
             useCase.execute("Nowhere")
             fail("Expected city lookup failure")
-        } catch (error: IllegalStateException) {
-            assertEquals("City not found", error.message)
+        } catch (error: CityNotFoundException) {
+            assertEquals(null, error.message)
         }
     }
 }

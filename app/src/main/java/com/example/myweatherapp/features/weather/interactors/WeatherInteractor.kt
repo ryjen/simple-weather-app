@@ -6,9 +6,19 @@ import com.example.myweatherapp.features.weather.reducers.weatherReducer
 import com.example.myweatherapp.features.weather.types.WeatherEffect
 import com.example.myweatherapp.features.weather.types.WeatherIntent
 import com.example.myweatherapp.features.weather.types.WeatherState
+import com.example.myweatherapp.features.weather.usecases.CityNotFoundException
 import com.example.myweatherapp.features.weather.usecases.LoadLastCityUseCase
 import com.example.myweatherapp.features.weather.usecases.SearchWeatherUseCase
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.TimeoutCancellationException
+import retrofit2.HttpException
 
 /**
  * The Interactor responsible for managing the business logic of the Weather feature.
@@ -36,7 +46,9 @@ class WeatherInteractor(
             WeatherIntent.LoadLastCityRequested -> loadLastCity()
             WeatherIntent.SearchSubmitted,
             WeatherIntent.RetryRequested -> search(state.cityName)
-            WeatherIntent.ForecastClicked -> emit(WeatherEffect.NavigateToForecast)
+            WeatherIntent.ForecastClicked -> if (state.forecast?.list?.isNotEmpty() == true) {
+                emit(WeatherEffect.NavigateToForecast)
+            }
             is WeatherIntent.CityNameChanged,
             is WeatherIntent.LastCityLoaded,
             is WeatherIntent.SearchFailed,
@@ -79,8 +91,28 @@ class WeatherInteractor(
                     )
                 }
                 .onFailure { error ->
-                    dispatch(WeatherIntent.SearchFailed(error.message ?: "An unknown error occurred"))
+                    dispatch(WeatherIntent.SearchFailed(error.toUserMessage()))
                 }
+        }
+    }
+
+    private fun Throwable.toUserMessage(): String {
+        return when (this) {
+            is CityNotFoundException -> "We couldn't find that city. Check the spelling and try again."
+            is TimeoutCancellationException,
+            is SocketTimeoutException -> "The weather service took too long to respond. Try again."
+            is UnknownHostException,
+            is ConnectException,
+            is SocketException -> "We couldn't connect to the weather service. Check your connection and try again."
+            is HttpException -> if (code() == 404) {
+                "We couldn't find that city. Check the spelling and try again."
+            } else {
+                "The weather service returned an error. Try again later."
+            }
+            is JsonDataException,
+            is JsonEncodingException -> "We couldn't read the weather response. Try again later."
+            is IOException -> "We couldn't connect to the weather service. Check your connection and try again."
+            else -> "Something went wrong. Try again."
         }
     }
 }

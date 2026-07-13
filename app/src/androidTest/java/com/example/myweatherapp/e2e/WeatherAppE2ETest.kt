@@ -1,6 +1,7 @@
 package com.example.myweatherapp.e2e
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -20,20 +21,11 @@ class WeatherAppE2ETest {
     }
 
     @Test
-    fun welcomeToWeatherToForecastAndBack() {
+    fun forecastDisabledBeforeSearch() {
         composeRule.onNodeWithTag("welcome_get_started").performClick()
 
         composeRule.onNodeWithText("Current Weather").assertIsDisplayed()
         composeRule.onNodeWithTag("current_weather_search").assertIsDisplayed()
-
-        composeRule.onNodeWithTag("current_weather_forecast").performClick()
-
-        composeRule.onNodeWithText("5-Day Forecast").assertIsDisplayed()
-        composeRule.onNodeWithText("No forecast data available").assertIsDisplayed()
-
-        composeRule.onNodeWithTag("forecast_back").performClick()
-
-        composeRule.onNodeWithText("Current Weather").assertIsDisplayed()
-        composeRule.onNodeWithTag("current_weather_search").assertIsDisplayed()
+        composeRule.onNodeWithTag("current_weather_forecast").assertIsNotEnabled()
     }
 }

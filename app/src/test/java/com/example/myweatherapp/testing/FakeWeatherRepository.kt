@@ -16,18 +16,24 @@ class FakeWeatherRepository : WeatherRepository {
     var coordinateQuery: String? = null
     var currentWeatherLocation: Pair<Double, Double>? = null
     var forecastLocation: Pair<Double, Double>? = null
+    var coordinatesError: Throwable? = null
+    var currentWeatherError: Throwable? = null
+    var forecastError: Throwable? = null
 
     override suspend fun getCoordinates(cityName: String): List<GeocodingResponse> {
+        coordinatesError?.let { throw it }
         coordinateQuery = cityName
         return coordinates
     }
 
     override suspend fun getCurrentWeather(lat: Double, lon: Double): CurrentWeatherResponse {
+        currentWeatherError?.let { throw it }
         currentWeatherLocation = lat to lon
         return currentWeather
     }
 
     override suspend fun getForecast(lat: Double, lon: Double): ForecastResponse {
+        forecastError?.let { throw it }
         forecastLocation = lat to lon
         return forecast
     }

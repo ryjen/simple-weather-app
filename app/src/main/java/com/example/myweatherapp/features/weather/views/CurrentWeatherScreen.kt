@@ -62,6 +62,7 @@ fun CurrentWeatherScreen(
                 actions = {
                     TextButton(
                         onClick = { dispatch(WeatherIntent.ForecastClicked) },
+                        enabled = state.forecast?.list?.isNotEmpty() == true,
                         modifier = Modifier.testTag("current_weather_forecast")
                     ) {
                         Text("Forecast")

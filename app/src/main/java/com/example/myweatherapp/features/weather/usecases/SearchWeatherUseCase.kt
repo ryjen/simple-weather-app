@@ -9,12 +9,14 @@ data class SearchWeatherResult(
     val forecast: ForecastResponse
 )
 
+class CityNotFoundException : RuntimeException()
+
 class SearchWeatherUseCase(
     private val repository: WeatherRepository
 ) {
     suspend fun execute(cityName: String): SearchWeatherResult {
         val coords = repository.getCoordinates(cityName)
-        val location = coords.firstOrNull() ?: error("City not found")
+        val location = coords.firstOrNull() ?: throw CityNotFoundException()
         val currentWeather = repository.getCurrentWeather(location.lat, location.lon)
         val forecast = repository.getForecast(location.lat, location.lon)
 
