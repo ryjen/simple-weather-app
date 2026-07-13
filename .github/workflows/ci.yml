@@ -46,11 +46,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Install XcodeGen
+      run: brew install xcodegen
+
+    - name: Generate Xcode Project
+      run: |
+        cd iosApp
+        xcodegen generate
+
     - name: Run Shared iOS Unit Tests
       run: ./gradlew :shared:iosSimulatorArm64Test
 
-    # This step assumes an Xcode project exists in the iosApp directory
-    # - name: Build iOS App
-    #   run: |
-    #     cd iosApp
-    #     xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Debug build
+    - name: Build iOS App
+      run: |
+        cd iosApp
+        xcodebuild -project iosApp.xcodeproj -scheme iosApp -sdk iphonesimulator -configuration Debug build

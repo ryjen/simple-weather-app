@@ -25,6 +25,11 @@ platform :android do
 end
 
 platform :ios do
+  desc "Generate Xcode Project"
+  lane :generate_project do
+    sh("cd ../iosApp && xcodegen generate")
+  end
+
   desc "Run shared iOS unit tests"
   lane :shared_tests do
     gradle(
@@ -35,8 +40,12 @@ platform :ios do
 
   desc "Build iOS app"
   lane :build do
-    # Requires an active macOS environment and Xcode project setup
-    # gym(scheme: "iosApp", project: "iosApp/iosApp.xcodeproj")
-    UI.message("iOS build requires a macOS environment with Xcode.")
+    generate_project
+    xcodebuild(
+      scheme: "iosApp",
+      project: "iosApp/iosApp.xcodeproj",
+      destination: "generic/platform=iOS Simulator",
+      configuration: "Debug"
+    )
   end
 end
