@@ -12,6 +12,7 @@ fun weatherReducer(state: WeatherState, intent: WeatherIntent): WeatherState {
             isLoading = true,
             errorMessage = null
         )
+
         is WeatherIntent.SearchSucceeded -> state.copy(
             cityName = intent.cityName,
             currentWeather = intent.currentWeather,
@@ -19,10 +20,12 @@ fun weatherReducer(state: WeatherState, intent: WeatherIntent): WeatherState {
             isLoading = false,
             errorMessage = null
         )
+
         is WeatherIntent.SearchFailed -> state.copy(
             isLoading = false,
             errorMessage = intent.message
         )
+
         WeatherIntent.ForecastClicked,
         WeatherIntent.LoadLastCityRequested,
         WeatherIntent.RetryRequested,

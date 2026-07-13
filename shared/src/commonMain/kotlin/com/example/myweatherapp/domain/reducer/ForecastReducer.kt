@@ -9,6 +9,7 @@ fun forecastReducer(state: ForecastState, intent: ForecastIntent): ForecastState
             forecast = intent.forecast,
             isLoading = intent.isLoading
         )
+
         ForecastIntent.BackClicked -> state
     }
 }

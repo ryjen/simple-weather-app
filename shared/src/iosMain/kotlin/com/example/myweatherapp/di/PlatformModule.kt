@@ -4,10 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.example.myweatherapp.data.local.WeatherPreferences
 import org.koin.dsl.module
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSURL
-import platform.Foundation.NSUserDomainMask
 
 actual fun platformModule() = module {
     single {

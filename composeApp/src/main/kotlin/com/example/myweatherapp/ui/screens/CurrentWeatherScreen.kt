@@ -1,12 +1,33 @@
 package com.example.myweatherapp.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +96,7 @@ fun CurrentWeatherScreen(
                 errorMessage != null -> ErrorContent(errorMessage) {
                     dispatch(WeatherIntent.RetryRequested)
                 }
+
                 weather != null -> WeatherContent(weather)
                 else -> Text(
                     "Search for a city to see the weather",
@@ -120,7 +142,8 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
             )
 
             Text(
-                text = weather.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: "",
+                text = weather.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() }
+                    ?: "",
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -130,7 +153,10 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                WeatherDetailItem(label = "Feels Like", value = "${weather.main.feelsLike.toInt()}°C")
+                WeatherDetailItem(
+                    label = "Feels Like",
+                    value = "${weather.main.feelsLike.toInt()}°C"
+                )
                 WeatherDetailItem(label = "Humidity", value = "${weather.main.humidity}%")
                 WeatherDetailItem(label = "Wind", value = "${weather.wind.speed} m/s")
             }
@@ -142,7 +168,11 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
 fun WeatherDetailItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

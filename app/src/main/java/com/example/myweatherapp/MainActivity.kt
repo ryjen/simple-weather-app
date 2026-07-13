@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,12 +22,12 @@ import com.example.myweatherapp.features.forecast.interactors.ForecastInteractor
 import com.example.myweatherapp.features.forecast.types.ForecastEffect
 import com.example.myweatherapp.features.forecast.types.ForecastIntent
 import com.example.myweatherapp.features.forecast.views.ForecastScreen
-import com.example.myweatherapp.features.welcome.interactors.WelcomeInteractor
-import com.example.myweatherapp.features.welcome.types.WelcomeEffect
-import com.example.myweatherapp.features.welcome.views.WelcomeScreen
 import com.example.myweatherapp.features.weather.interactors.WeatherInteractor
 import com.example.myweatherapp.features.weather.types.WeatherEffect
 import com.example.myweatherapp.features.weather.views.CurrentWeatherScreen
+import com.example.myweatherapp.features.welcome.interactors.WelcomeInteractor
+import com.example.myweatherapp.features.welcome.types.WelcomeEffect
+import com.example.myweatherapp.features.welcome.views.WelcomeScreen
 import com.example.myweatherapp.ui.NavRoute
 import com.example.myweatherapp.ui.theme.MyWeatherAppTheme
 
@@ -47,8 +47,22 @@ class MainActivity : ComponentActivity() {
 fun WeatherApp() {
     val context = LocalContext.current
     val appGraph = remember { WeatherAppGraph(context.applicationContext) }
-    val welcomeInteractor: WelcomeInteractor = viewModel()
-    val forecastInteractor: ForecastInteractor = viewModel()
+    val welcomeInteractor: WelcomeInteractor = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return appGraph.createWelcomeInteractor() as T
+            }
+        }
+    )
+    val forecastInteractor: ForecastInteractor = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return appGraph.createForecastInteractor() as T
+            }
+        }
+    )
     val weatherInteractor: WeatherInteractor = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -87,6 +101,16 @@ fun WeatherApp() {
                 ForecastEffect.NavigateBack -> if (backStack.size > 1) {
                     backStack.removeAt(backStack.size - 1)
                 }
+
+                ForecastEffect.NavigateToWeather -> {
+                    // Navigate back to weather if it's in the stack, otherwise go to it.
+                    // Since it's usually CurrentWeather -> Forecast, we just pop back.
+                    if (backStack.size > 1) {
+                        backStack.removeAt(backStack.size - 1)
+                    } else {
+                        backStack.add(NavRoute.CurrentWeather)
+                    }
+                }
             }
         }
     }
@@ -116,6 +140,7 @@ fun WeatherApp() {
                         )
                     }
                 }
+
                 is NavRoute.CurrentWeather -> {
                     NavEntry(key) {
                         CurrentWeatherScreen(
@@ -124,6 +149,7 @@ fun WeatherApp() {
                         )
                     }
                 }
+
                 is NavRoute.Forecast -> {
                     NavEntry(key) {
                         ForecastScreen(
@@ -132,6 +158,7 @@ fun WeatherApp() {
                         )
                     }
                 }
+
                 else -> NavEntry(key) { }
             }
         }

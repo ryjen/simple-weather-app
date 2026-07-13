@@ -24,6 +24,7 @@ class WeatherInteractor(
             WeatherIntent.LoadLastCityRequested -> loadLastCity()
             WeatherIntent.SearchSubmitted,
             WeatherIntent.RetryRequested -> search(state.cityName)
+
             WeatherIntent.ForecastClicked -> emit(WeatherEffect.NavigateToForecast)
             is WeatherIntent.CityNameChanged,
             is WeatherIntent.LastCityLoaded,
@@ -60,7 +61,11 @@ class WeatherInteractor(
                     )
                 }
                 .onFailure { error ->
-                    dispatch(WeatherIntent.SearchFailed(error.message ?: "An unknown error occurred"))
+                    dispatch(
+                        WeatherIntent.SearchFailed(
+                            error.message ?: "An unknown error occurred"
+                        )
+                    )
                 }
         }
     }

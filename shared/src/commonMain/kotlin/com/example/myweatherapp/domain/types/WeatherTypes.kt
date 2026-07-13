@@ -23,6 +23,7 @@ sealed interface WeatherIntent {
         val currentWeather: CurrentWeatherResponse,
         val forecast: ForecastResponse
     ) : WeatherIntent
+
     data class SearchFailed(val message: String) : WeatherIntent
     data object ForecastClicked : WeatherIntent
 }

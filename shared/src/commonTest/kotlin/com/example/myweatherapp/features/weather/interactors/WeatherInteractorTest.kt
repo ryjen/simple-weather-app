@@ -11,22 +11,26 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import kotlin.test.BeforeTest
-import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WeatherInteractorTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @BeforeTest
-    fun setup() { mainDispatcherRule.setup() }
+    fun setup() {
+        mainDispatcherRule.setup()
+    }
 
     @kotlin.test.AfterTest
-    fun tearDown() { mainDispatcherRule.tearDown() }
+    fun tearDown() {
+        mainDispatcherRule.tearDown()
+    }
 
     @Test
     fun initLoadsLastCityAndSearchesWeather() = runTest {

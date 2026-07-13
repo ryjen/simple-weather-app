@@ -23,13 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.example.myweatherapp.R
 import com.example.myweatherapp.domain.types.WelcomeIntent
-import com.example.myweatherapp.ui.theme.MyWeatherAppTheme
-
-import org.jetbrains.compose.resources.stringResource
-import myweatherapp.composeapp.generated.resources.Res
-import myweatherapp.composeapp.generated.resources.app_name
 
 @Composable
 fun WelcomeScreen(dispatch: (WelcomeIntent) -> Unit) {
@@ -54,7 +51,7 @@ fun WelcomeScreen(dispatch: (WelcomeIntent) -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Welcome to ${stringResource(Res.string.app_name)}",
+                text = "Welcome to ${stringResource(R.string.app_name)}",
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 32.sp

@@ -1,10 +1,12 @@
 package com.example.myweatherapp.features.weather.types
 
-import com.example.myweatherapp.data.model.CurrentWeatherResponse
-import com.example.myweatherapp.data.model.ForecastResponse
+import com.example.myweatherapp.domain.model.CurrentWeatherResponse
+import com.example.myweatherapp.domain.model.ForecastResponse
+import com.example.myweatherapp.domain.model.GeocodingResponse
 
 data class WeatherState(
     val cityName: String = "",
+    val searchResults: List<GeocodingResponse> = emptyList(),
     val currentWeather: CurrentWeatherResponse? = null,
     val forecast: ForecastResponse? = null,
     val isLoading: Boolean = false,
@@ -23,8 +25,11 @@ sealed interface WeatherIntent {
         val currentWeather: CurrentWeatherResponse,
         val forecast: ForecastResponse
     ) : WeatherIntent
+
     data class SearchFailed(val message: String) : WeatherIntent
     data object ForecastClicked : WeatherIntent
+    data class SearchResultsFound(val results: List<GeocodingResponse>) : WeatherIntent
+    data class CitySelected(val location: GeocodingResponse) : WeatherIntent
 }
 
 sealed interface WeatherEffect {

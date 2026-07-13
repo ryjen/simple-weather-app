@@ -3,10 +3,10 @@ package com.example.myweatherapp.domain.usecase
 import com.example.myweatherapp.testing.FakeWeatherRepository
 import com.example.myweatherapp.testing.sampleCoordinates
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.fail
-import kotlin.test.Test
 
 class SearchWeatherUseCaseTest {
     @Test

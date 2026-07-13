@@ -3,10 +3,10 @@ package com.example.myweatherapp.domain.reducer
 import com.example.myweatherapp.domain.types.ForecastIntent
 import com.example.myweatherapp.domain.types.ForecastState
 import com.example.myweatherapp.testing.sampleForecast
+import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import kotlin.test.Test
 
 class ForecastReducerTest {
     @Test
