@@ -19,8 +19,8 @@
 
 
         androidComposition = pkgs.androidenv.composeAndroidPackages {
-          platformVersions = [ "34" "35" ];
-          buildToolsVersions = [ "34.0.0" "35.0.0" ];
+          platformVersions = [ "34" "35" "37" ];
+          buildToolsVersions = [ "34.0.0" "35.0.0" "37.0.0" ];
           cmdLineToolsVersion = "latest";
           platformToolsVersion = "35.0.2";
           includeNDK = false;
