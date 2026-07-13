@@ -40,6 +40,7 @@ import com.example.myweatherapp.features.forecast.types.ForecastState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,8 +70,8 @@ fun ForecastScreen(
                 .padding(innerPadding)
         ) {
             when {
-                state.forecast != null -> ForecastList(state.forecast.list)
                 state.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                state.forecast != null -> ForecastList(state.forecast.list)
                 else -> Text(
                     "No forecast data available",
                     modifier = Modifier.align(Alignment.Center)
@@ -120,7 +121,7 @@ fun ForecastItemView(item: ForecastItem) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "${item.main.temp.toInt()}°C",
+                    text = "${item.main.temp.roundToInt()}°C",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )

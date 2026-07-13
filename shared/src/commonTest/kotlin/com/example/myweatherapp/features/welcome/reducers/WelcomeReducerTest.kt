@@ -1,5 +1,6 @@
-package com.example.myweatherapp.domain.reducer
+package com.example.myweatherapp.features.welcome.reducers
 
+import com.example.myweatherapp.domain.reducer.welcomeReducer
 import com.example.myweatherapp.domain.types.WelcomeIntent
 import com.example.myweatherapp.domain.types.WelcomeState
 import kotlin.test.Test

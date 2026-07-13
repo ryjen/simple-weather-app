@@ -46,6 +46,7 @@ import com.example.myweatherapp.data.model.WeatherDescription
 import com.example.myweatherapp.data.model.Wind
 import com.example.myweatherapp.features.weather.types.WeatherIntent
 import com.example.myweatherapp.features.weather.types.WeatherState
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,7 +140,7 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
             )
 
             Text(
-                text = "${weather.main.temp.toInt()}°C",
+                text = "${weather.main.temp.roundToInt()}°C",
                 style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = 72.sp
@@ -157,7 +158,7 @@ fun WeatherContent(weather: CurrentWeatherResponse) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                WeatherDetailItem(label = "Feels Like", value = "${weather.main.feelsLike.toInt()}°C")
+                WeatherDetailItem(label = "Feels Like", value = "${weather.main.feelsLike.roundToInt()}°C")
                 WeatherDetailItem(label = "Humidity", value = "${weather.main.humidity}%")
                 WeatherDetailItem(label = "Wind", value = "${weather.wind.speed} m/s")
             }

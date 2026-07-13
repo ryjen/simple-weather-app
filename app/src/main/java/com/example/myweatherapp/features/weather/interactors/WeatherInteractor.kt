@@ -8,6 +8,7 @@ import com.example.myweatherapp.features.weather.types.WeatherIntent
 import com.example.myweatherapp.features.weather.types.WeatherState
 import com.example.myweatherapp.features.weather.usecases.LoadLastCityUseCase
 import com.example.myweatherapp.features.weather.usecases.SearchWeatherUseCase
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
@@ -22,6 +23,8 @@ class WeatherInteractor(
     private val searchWeatherUseCase: SearchWeatherUseCase,
     private val loadLastCityUseCase: LoadLastCityUseCase
 ) : Interactor<WeatherState, WeatherIntent, WeatherEffect>(WeatherState(), ::weatherReducer) {
+
+    private var searchJob: Job? = null
 
     init {
         // Automatically load the last searched city on initialization
@@ -66,8 +69,9 @@ class WeatherInteractor(
         val cityName = rawCityName.trim()
         if (cityName.isEmpty()) return
 
+        searchJob?.cancel()
         dispatch(WeatherIntent.SearchStarted(cityName))
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             runCatching { searchWeatherUseCase.execute(cityName) }
                 .onSuccess { result ->
                     dispatch(
