@@ -38,6 +38,7 @@ google-services.json
 .serena
 
 # Ruby/Fastlane
+fastlane/report.xml
 vendor/
 .bundle/
 Gemfile.lock
