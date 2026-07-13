@@ -31,6 +31,9 @@ import com.example.myweatherapp.features.weather.views.CurrentWeatherScreen
 import com.example.myweatherapp.ui.NavRoute
 import com.example.myweatherapp.ui.theme.MyWeatherAppTheme
 
+private const val APP_PREFS_NAME = "weather_prefs"
+private const val HAS_SEEN_WELCOME_KEY = "has_seen_welcome"
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,12 +66,27 @@ fun WeatherApp() {
     val forecastDispatch = forecastInteractor::dispatch
     val dispatch = weatherInteractor::dispatch
 
-    val backStack = rememberNavBackStack(NavRoute.Welcome)
+    val appPreferences = remember {
+        context.applicationContext.getSharedPreferences(APP_PREFS_NAME, android.content.Context.MODE_PRIVATE)
+    }
+    val initialRoute = remember {
+        if (appPreferences.getBoolean(HAS_SEEN_WELCOME_KEY, false)) {
+            NavRoute.CurrentWeather
+        } else {
+            NavRoute.Welcome
+        }
+    }
+
+    val backStack = rememberNavBackStack(initialRoute)
 
     LaunchedEffect(welcomeInteractor, backStack) {
         welcomeInteractor.effects.collect { effect ->
             when (effect) {
-                WelcomeEffect.NavigateToWeather -> backStack.add(NavRoute.CurrentWeather)
+                WelcomeEffect.NavigateToWeather -> {
+                    appPreferences.edit().putBoolean(HAS_SEEN_WELCOME_KEY, true).apply()
+                    backStack.clear()
+                    backStack.add(NavRoute.CurrentWeather)
+                }
             }
         }
     }
