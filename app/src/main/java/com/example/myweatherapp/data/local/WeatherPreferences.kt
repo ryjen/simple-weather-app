@@ -26,4 +26,10 @@ class WeatherPreferences(private val context: Context) {
             preferences[LAST_CITY_KEY] = city
         }
     }
+
+    suspend fun clear() {
+        context.dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }
