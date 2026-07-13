@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -32,14 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.myweatherapp.data.model.ForecastItem
-import com.example.myweatherapp.data.model.MainWeather
-import com.example.myweatherapp.data.model.WeatherDescription
+import com.example.myweatherapp.features.forecast.types.DailyForecast
 import com.example.myweatherapp.features.forecast.types.ForecastIntent
 import com.example.myweatherapp.features.forecast.types.ForecastState
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.myweatherapp.features.forecast.types.HourlyForecast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +66,7 @@ fun ForecastScreen(
                 .padding(innerPadding)
         ) {
             when {
-                state.forecast != null -> ForecastList(state.forecast.list)
+                state.days.isNotEmpty() -> ForecastList(state.days)
                 state.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 else -> Text(
                     "No forecast data available",
@@ -81,63 +78,70 @@ fun ForecastScreen(
 }
 
 @Composable
-fun ForecastList(items: List<ForecastItem>) {
+fun ForecastList(days: List<DailyForecast>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(items) { item ->
-            ForecastItemView(item)
+        items(days) { day ->
+            ForecastDayView(day)
         }
     }
 }
 
 @Composable
-fun ForecastItemView(item: ForecastItem) {
+fun ForecastDayView(day: DailyForecast) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column {
-                Text(
-                    text = formatTimestamp(item.dt),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = item.weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: "",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "${item.main.temp.toInt()}°C",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${item.weather.firstOrNull()?.icon}.png",
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
+            Text(
+                text = day.dateLabel,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(day.hours) { hour ->
+                    ForecastHourView(hour)
+                }
             }
         }
     }
 }
 
-private fun formatTimestamp(timestamp: Long): String {
-    val date = Date(timestamp * 1000L)
-    val sdf = SimpleDateFormat("EEE, MMM d, HH:mm", Locale.getDefault())
-    return sdf.format(date)
+@Composable
+fun ForecastHourView(hour: HourlyForecast) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = hour.timeLabel,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold
+        )
+        AsyncImage(
+            model = "https://openweathermap.org/img/wn/${hour.icon}.png",
+            contentDescription = null,
+            modifier = Modifier.size(48.dp)
+        )
+        Text(
+            text = "${hour.tempCelsius}°C",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = hour.description,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
 }
 
 @Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
@@ -145,18 +149,13 @@ private fun formatTimestamp(timestamp: Long): String {
 fun ForecastScreenPreview() {
     MaterialTheme {
         ForecastList(
-            items = listOf(
-                ForecastItem(
-                    dt = 1625068800,
-                    main = MainWeather(20.0, 22.0, 60, 1012),
-                    weather = listOf(WeatherDescription("Clouds", "few clouds", "02d")),
-                    dtTxt = "2021-06-30 12:00:00"
-                ),
-                ForecastItem(
-                    dt = 1625079600,
-                    main = MainWeather(18.0, 20.0, 65, 1011),
-                    weather = listOf(WeatherDescription("Rain", "light rain", "10d")),
-                    dtTxt = "2021-06-30 15:00:00"
+            days = listOf(
+                DailyForecast(
+                    dateLabel = "Wed, Jun 30",
+                    hours = listOf(
+                        HourlyForecast("12:00", 20, "Few clouds", "02d"),
+                        HourlyForecast("15:00", 18, "Light rain", "10d")
+                    )
                 )
             )
         )

@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,7 +25,8 @@ class ForecastInteractorTest {
 
         interactor.dispatch(ForecastIntent.ForecastDataChanged(forecast, isLoading = true))
 
-        assertSame(forecast, interactor.state.value.forecast)
+        assertEquals(1, interactor.state.value.days.size)
+        assertEquals(1, interactor.state.value.days.first().hours.size)
         assertEquals(true, interactor.state.value.isLoading)
     }
 
