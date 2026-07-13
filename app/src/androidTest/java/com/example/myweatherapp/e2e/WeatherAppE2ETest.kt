@@ -1,6 +1,5 @@
 package com.example.myweatherapp.e2e
 
-import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -10,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.myweatherapp.MainActivity
+import com.example.myweatherapp.data.local.SharedPreferencesOnboardingRepository
 import com.example.myweatherapp.data.local.WeatherPreferences
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -53,16 +53,9 @@ class WeatherAppE2ETest {
 
     private fun clearAppState() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        context.getSharedPreferences(APP_PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .clear()
-            .commit()
+        SharedPreferencesOnboardingRepository(context).clear()
         runBlocking {
             WeatherPreferences(context).clear()
         }
-    }
-
-    private companion object {
-        const val APP_PREFS_NAME = "weather_prefs"
     }
 }
