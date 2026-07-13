@@ -1,65 +1,41 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build debug APK"
+  desc "Build debug APK for ComposeApp"
   lane :build_debug do
-    gradle(task: "clean assembleDebug")
+    gradle(task: "clean :composeApp:assembleDebug")
   end
 
-  desc "Build release APK with signing"
+  desc "Build release APK for ComposeApp"
   lane :build_release do
-    gradle(task: "clean assembleRelease")
+    gradle(task: "clean :composeApp:assembleRelease")
   end
 
-  desc "Build and test"
+  desc "Run all tests"
   lane :test do
     gradle(task: "test")
   end
 
-  desc "Run unit tests"
+  desc "Run unit tests for shared and composeApp"
   lane :unit_tests do
-    gradle(task: "testDebugUnitTest")
+    gradle(task: ":shared:testDebugUnitTest :composeApp:testDebugUnitTest")
   end
 
   desc "Deploy to Firebase App Distribution"
   lane :deploy_firebase do
-    apk_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || "app/build/outputs/apk/release/app-release.apk"
+    apk_path = lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] || "composeApp/build/outputs/apk/release/composeApp-release.apk"
     
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       apk_path: apk_path,
       groups: "testers",
-      release_notes: "Build: #{ENV['GITHUB_SHA'] || `git rev-parse --short HEAD`.strip}"
+      release_notes: "KMP Build: #{ENV['GITHUB_SHA'] || `git rev-parse --short HEAD`.strip}"
     )
   end
 
-  desc "Build and deploy to Firebase"
-  lane :build_and_deploy_firebase do
-    build_release
-    deploy_firebase
-  end
-
-  desc "Build and deploy to internal track"
-  lane :deploy_internal do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store(track: 'internal')
-  end
-
-  desc "Build and deploy to beta track"
-  lane :deploy_beta do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store(track: 'beta')
-  end
-
-  desc "Build and deploy to production"
-  lane :deploy_production do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store(track: 'production')
-  end
-
-  desc "Increment version code"
+  desc "Increment version code in composeApp"
   lane :bump_version_code do
-    path = '../app/build.gradle.kts'
+    path = '../composeApp/build.gradle.kts'
     replace = lambda { |file, old, new|
       text = File.read(file)
       File.write(file, text.gsub(old, new))
@@ -72,45 +48,20 @@ platform :android do
     
     UI.success("Version code bumped from #{current_version_code} to #{new_version_code}")
   end
+end
 
-  desc "Increment version name"
-  lane :bump_version_name do |options|
-    path = '../app/build.gradle.kts'
-    
-    current_version_name = File.read(path).match(/versionName = "([\d.]+)"/)[1]
-    parts = current_version_name.split('.').map(&:to_i)
-    
-    case options[:type]
-    when :major
-      parts[0] += 1
-      parts[1] = 0
-      parts[2] = 0
-    when :minor
-      parts[1] += 1
-      parts[2] = 0
-    when :patch
-      parts[2] += 1
-    else
-      parts[2] += 1
-    end
-    
-    new_version_name = parts.join('.')
-    
-    replace = lambda { |file, old, new|
-      text = File.read(file)
-      File.write(file, text.gsub(old, new))
-    }
-    
-    replace.call(path, "versionName = \"#{current_version_name}\"", "versionName = \"#{new_version_name}\"")
-    
-    UI.success("Version name bumped from #{current_version_name} to #{new_version_name}")
+platform :ios do
+  desc "Build iOS app"
+  lane :build do
+    # Placeholder for actual iOS build command
+    # Requires an active macOS environment and Xcode project setup
+    # xcodebuild(scheme: "iosApp", workspace: "iosApp/iosApp.xcworkspace", configuration: "Release")
+    UI.message("iOS build requires a macOS environment with Xcode.")
   end
 
-  after_all do |lane|
-    # This block is called if the executed lane was successful
-  end
-
-  error do |lane, exception|
-    # This block is called if there was an error in the executed lane
+  desc "Run iOS tests"
+  lane :test do
+    # scan(scheme: "iosApp", workspace: "iosApp/iosApp.xcworkspace", device: "iPhone 15")
+    UI.message("iOS testing requires a macOS environment with Xcode.")
   end
 end

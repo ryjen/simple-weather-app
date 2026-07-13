@@ -1,2 +1,2 @@
-json_key_file("") # Path to the json secret file - Follow JSON key instructions (https://docs.fastlane.tools/getting-started/android/setup/)
-package_name("com.example.myweatherapp") # e.g. com.krausefx.app
+json_key_file("")
+package_name("com.example.myweatherapp.kmp")
